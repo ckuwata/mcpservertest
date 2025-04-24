@@ -1,0 +1,76 @@
+# ollamaにWebUIで接続
+# 参考: $ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+
+version: '3.8'
+services:
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - OLLAMA_API_URL=http://127.0.0.1:11434
+      - OLLAMA_BASE_URL=/
+    network_mode: host
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama:$HOME/ollama/data
+    network_mode: host
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - NEO4J_AUTH=neo4j/testpassword
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+  mcp-server:
+    build: .
+    container_name: mcp-server
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - MCP_SERVER_PORT=3001
+      - DEBUG=*
+    command: ["node", "build/index.js"]
+  
+volumes:
+  ollama:
+  open-webui:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/ollama/open-webui
+      o: bind
+  neo4j_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/neo4j/data
+      o: bind
+  neo4j_logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/neo4j/logs
+      o: bind
+  neo4j_import:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/neo4j/import
+      o: bind
+  neo4j_plugins:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/neo4j/plugins
+      o: bind
