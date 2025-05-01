@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "graphRAG": "tsc && node build/graphRAG.js"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +17,14 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@langchain/community": "^0.3.42",
+    "@langchain/ollama": "^0.2.0",
     "@modelcontextprotocol/sdk": "^1.10.2",
     "@types/express": "^5.0.1",
+    "axios": "^1.9.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "langchain": "^0.3.24",
     "neo4j-driver": "^5.28.1",
     "zod": "^3.24.3"
   }
